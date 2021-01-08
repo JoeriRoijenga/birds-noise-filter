@@ -65,11 +65,9 @@ if __name__ == "__main__" :
 
     a = np.array([-2.014248,1.985752])            # High pass filter values
     b = np.array([-2,2])
-    
-    subDat = None
-    
+        
     for i in range(3):
-        subDat= IIR_filter(subDat, a, b)
+        subDat = IIR_filter(subDat, a, b)
 
     # Take DFT and scale results
     freq = np.fft.fftfreq(Nfrms, Ts)
@@ -86,7 +84,7 @@ if __name__ == "__main__" :
     sampleRate = 44100.0                        # hertz
     duration = 30                               # seconds
     
-    obj = wave.open('test2.wav','wb')
+    obj = wave.open('filter2.wav','wb')
     obj.setnchannels(2)                         # mono 1, for stereo 2
     obj.setsampwidth(2)
     obj.setframerate(sampleRate)
