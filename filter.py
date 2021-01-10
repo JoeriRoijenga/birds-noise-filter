@@ -35,7 +35,9 @@ def readwav(file):
     data = wav.readframes(nframes)
     wav.close()
     fmt=''
-
+    
+    duration = nframes/rate
+    
     for i in range (0,nframes):
         fmt = fmt + 'h' 
         # fmt should contain 'h'for each samples in wave file: 'hhhhh...'
@@ -47,59 +49,51 @@ def readwav(file):
     t = np.arange(0, nframes / rate, 1 / rate) # start,stop, step fill array    
     D = struct.unpack(fmt, data) # from binary to integer
 
-    return nchannels, rate, sampwidth, nframes, t, D
+    return nchannels, rate, sampwidth, nframes, t, D, duration
 
+def writewav(nchannels, samplerate, samplewidth, duration, subDat):
+    file = wave.open('test2.wav','wb')
+    file.setnchannels(nchannels)                      # mono 1, for stereo 2
+    file.setsampwidth(samplewidth)
+    file.setframerate(samplerate)
+
+    N = round(duration * samplerate)                 # no of samples
+    
+    if (N % 2) != 0:
+        N += 1
+        
+    # Pack data in wav file
+    for i in range(N):
+        value = round(subDat[i])                     # data should be integer
+        data = struct.pack('<h', value)
+        file.writeframesraw(data)
+
+    file.close()
 
 # Main
 if __name__ == "__main__" :
-    nchannels, samplerate, samplewidth, Nfrms, time, Data = readwav('file2.wav')
-    Ts = 1 / samplerate
-    t = np.arange(Nfrms) * Ts
+    nchannels, samplerate, samplewidth, Nfrms, time, Data, duration = readwav('file2.wav')
 
     # Take subset of Data
     strt = 0
     step = len(Data)                              # Number of intervals
     stp = strt + step
-    intervals = stp - strt
     subDat = Data[strt:stp]
 
-    a = np.array([-2.014248,1.985752])            # High pass filter values
-    b = np.array([-2,2])
-        
+   # a = np.array([-2.142717,1.857283])                # 10000
+    # b = np.array([-2,2])
+    #a = np.array([-2.257871,1.742129])                # 18000
+    #b = np.array([-2,2])
+    # a = np.array([-2.374732,1.625268])               # 26000
+    # b = np.array([-2,2])
+    #a = np.array([4.424034,-7.959264,3.616703])       # 10000
+    #b = np.array([4,-8,4])
+    #a = np.array([4.795868,-7.867005,3.337127])       # 18000
+    #b = np.array([4,-8,4])
+    a = np.array([5.200327,-7.719151,3.080521])        # 26000
+    b = np.array([4,-8,4])
+    
     for i in range(3):
-        subDat = IIR_filter(subDat, a, b)
+        subDat= IIR_filter(subDat, a, b)
 
-    # Take DFT and scale results
-    freq = np.fft.fftfreq(Nfrms, Ts)
-
-    sp = abs(2 / intervals * np.fft.fft(subDat))    # z, y=i, for log scale
-    k = int(np.trunc(len(sp) / 2))                  # only first half <Fs/2 contains valid data
-    sp = sp[0:k]
-    freq = np.fft.fftfreq(intervals, Ts)
-    freq = freq[0:k]
-    t = np.arange(step) * Ts
-    Data = subDat
-
-    # Save file settings
-    sampleRate = 44100.0                        # hertz
-    duration = 30                               # seconds
-    
-    obj = wave.open('filter2.wav','wb')
-    obj.setnchannels(2)                         # mono 1, for stereo 2
-    obj.setsampwidth(2)
-    obj.setframerate(sampleRate)
-
-    N = round(duration * sampleRate)                # no of samples
-    Ts = 1 / sampleRate                             # sample time in s
-    
-    if (N % 2) != 0:
-        N += 1
-
-    maxint = 32767 - 1
-
-    for i in range(N):
-        value = round(Data[i])                  # data should be integer
-        data = struct.pack('<h', value)         # Pack data in wav file
-        obj.writeframesraw(data)
-
-    obj.close()
+    writewav(nchannels, samplerate, samplewidth, duration, subDat)
