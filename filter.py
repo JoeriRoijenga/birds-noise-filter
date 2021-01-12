@@ -52,7 +52,7 @@ def readwav(file):
     return nchannels, rate, sampwidth, nframes, t, D, duration
 
 def writewav(nchannels, samplerate, samplewidth, duration, subDat):
-    file = wave.open('test2.wav','wb')
+    file = wave.open('filter1.wav','wb')
     file.setnchannels(nchannels)                      # mono 1, for stereo 2
     file.setsampwidth(samplewidth)
     file.setframerate(samplerate)
@@ -72,7 +72,7 @@ def writewav(nchannels, samplerate, samplewidth, duration, subDat):
 
 # Main
 if __name__ == "__main__" :
-    nchannels, samplerate, samplewidth, Nfrms, time, Data, duration = readwav('file2.wav')
+    nchannels, samplerate, samplewidth, Nfrms, time, Data, duration = readwav('file1.wav')
 
     # Take subset of Data
     strt = 0
@@ -80,19 +80,14 @@ if __name__ == "__main__" :
     stp = strt + step
     subDat = Data[strt:stp]
 
-   # a = np.array([-2.142717,1.857283])                # 10000
-    # b = np.array([-2,2])
-    #a = np.array([-2.257871,1.742129])                # 18000
-    #b = np.array([-2,2])
-    # a = np.array([-2.374732,1.625268])               # 26000
-    # b = np.array([-2,2])
-    #a = np.array([4.424034,-7.959264,3.616703])       # 10000
+    a = np.array([-2.142717,1.857283])
+    b = np.array([-2,2])
+    #a = np.array([4.424034,-7.959264,3.616703])
     #b = np.array([4,-8,4])
-    #a = np.array([4.795868,-7.867005,3.337127])       # 18000
-    #b = np.array([4,-8,4])
-    a = np.array([5.200327,-7.719151,3.080521])        # 26000
-    b = np.array([4,-8,4])
     
+    # a = np.array([1.000000000000000,-3.619724057745430,5.384488461116604,-4.088649657052628,1.579037255944415,-0.247487118545669]) # 3000
+    # b = np.array([0.497480829700148,-2.487404148500741,4.974808297001482,-4.974808297001482,2.487404148500741,-0.497480829700148])
+
     for i in range(3):
         subDat= IIR_filter(subDat, a, b)
 
